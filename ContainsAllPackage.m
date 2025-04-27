@@ -1,0 +1,12 @@
+RunTests;
+showFig1;
+showFig2;
+showFig3;
+showFig4;
+showFig5;
+showFig6;
+showFig7;
+showFig8;
+showFigSM1;
+showFigSM2;
+showFigSM3;
