@@ -1,4 +1,4 @@
-filePath='../../dataset/surface';
+filePath='../../../dataset/surface';
 files=dir(filePath);
 FileName={files.name};
 slpFileName=FileName(contains(FileName,'slp'));

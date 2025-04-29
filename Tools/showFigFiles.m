@@ -5,7 +5,7 @@ function showFigFiles(varargin)
     
     % 检查输入是否提供
     if nargin < 1
-        error('请提供文件夹路径！');
+        error('Please enter the folder path!');
     end
     p = inputParser;
     addParameter(p,'FolderName', {}, @(x) iscell(x) || ischar(x) || isstring(x));
@@ -47,7 +47,7 @@ function showFigFiles(varargin)
     
     % 检查是否有 .fig 文件
     if isempty(figFiles)
-        disp(['文件夹 "', folderPath, '" 中没有找到 .fig 文件！']);
+        disp(['Folder "', folderPath, '"not find the .fig files!']);
         return;
     end
 
@@ -84,5 +84,5 @@ function showFigFiles(varargin)
     end
     
     % 显示完成
-    disp('所有 .fig 文件显示完毕！');
+    disp('All figures displayed!');
 end

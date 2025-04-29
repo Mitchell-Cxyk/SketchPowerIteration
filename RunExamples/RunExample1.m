@@ -5,7 +5,7 @@ cd 'TYUC17SPI/';
 %%
 % Run
 mkdir('data');
-% example1;
+example1;
 cd '../';
 cd 'VerifyPerformance/TYUC17withSPSOracle';
 %%

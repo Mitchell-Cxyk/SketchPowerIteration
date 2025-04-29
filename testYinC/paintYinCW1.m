@@ -1,7 +1,6 @@
 changeCurrentFolderToScriptFolder();
-if ~exist('figure','dir')
-    mkdir('figure');
-end
+
+mkdir('figure/W1');
 figure;
 paintTYUCYinCW1('lowrank',0.0001);
 xlim([30,150]);

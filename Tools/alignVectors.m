@@ -5,7 +5,7 @@ function varargout = alignVectors(varargin)
         
         % 检查输入
         if nargin < 2
-            error('至少需要输入2个向量');
+            error('Must provide at least two vectors for alignment.');
         end
         
         % 第一步：调整基准向量（v1）
@@ -17,7 +17,7 @@ function varargout = alignVectors(varargin)
         % 如果负元素占多数（比例<0.5），则翻转基准向量
         if positive_ratio < 0.5
             v1 = -v1;
-            fprintf('注意：基准向量已被翻转以保持多数元素为正\n');
+            fprintf('Be careful: The reference vector has been flipped to keep the majority of elements positive\n');
         end
         
         % 第二步：对齐其他向量

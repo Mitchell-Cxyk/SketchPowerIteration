@@ -1,4 +1,6 @@
 function testFixedPrecisionWithDifferentDistribution(decay,decayRate,distribution)
+fileName=['data/',decay,'_',num2str(decayRate),'_single_fp_',distribution,'.mat'];
+if ~exist(fileName)
 addpath('../');
 % Store the data
 MentoCarloNum=20;
@@ -67,8 +69,9 @@ errList1(indexPre,:,1:size(errListPre,3),1:size(errListPre,4))=errListPre;
     errList1(index,:,:,:)=errList;
     errList=errList1;
     Tlist=Tlist1;
-fileName=['data/',decay,'_',num2str(decayRate),'_single_fp_',distribution,'.mat'];
+
 save(fileName,"errList","Tlist");
+end
 end
 % Plot results
 % for iterq=1:numel(iterlist)

@@ -1,5 +1,5 @@
 % Specify the folder where the PNG files are located
-folder = '../../dataset/by_class/30/';
+folder = '../../../dataset/by_class/30/';
 
 % Get a list of all PNG files in the folder and subfolders
 filePattern = fullfile(folder, '**', '*.png');

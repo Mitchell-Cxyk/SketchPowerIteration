@@ -18,16 +18,14 @@ end
 mkdir('data');
 %%
 cd 'figure';
-if ~exist('NISTSingularValue','dir')
-    mkdir('NISTSingularValue');
-end
-if ~exist('NISTSingularVector','dir')
-    mkdir('NISTSingularVector');
-end
+mkdir('NISTSingularValue');
+
+
+mkdir('NISTSingularVector');
 cd 'NISTSingularVector';
-if ~exist('SingularVectorError','dir')
-    mkdir('SingularVectorError');
-end
+
+mkdir('SingularVectorError');
+
 mkdir('SingularVectorVis');
 cd ..;
 cd ..;

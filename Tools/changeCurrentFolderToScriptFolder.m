@@ -19,19 +19,19 @@ function changeCurrentFolderToScriptFolder(verbose)
     if isempty(stack)
         scriptFolder = pwd;
         if verbose
-            disp('未检测到调用者脚本，使用当前目录作为工作目录。');
+            disp('The call stack is empty, using the current directory as the working directory.');
         end
     else
         % 获取调用者的文件路径
         callerFile = stack(1).file;
         if verbose
-            disp(['调用者文件路径 (原始): ', callerFile]);
+            disp(['Caller File is ', callerFile]);
         end
         
         if isempty(callerFile)
             scriptFolder = pwd;
             if verbose
-                disp('调用者文件路径为空，使用当前目录作为工作目录。');
+                disp('The caller file is empty, using the current directory as the working directory.');
             end
         else
             % 如果 callerFile 只包含文件名，使用 which 获取完整路径
@@ -40,12 +40,12 @@ function changeCurrentFolderToScriptFolder(verbose)
                 if isempty(fullCallerFile)
                     scriptFolder = pwd;
                     if verbose
-                        disp('无法通过 which 找到文件完整路径，使用当前目录作为工作目录。');
+                        disp('The caller file is not found, using the current directory as the working directory.');
                     end
                 else
                     callerFile = fullCallerFile;
                     if verbose
-                        disp(['调用者文件路径 (完整): ', callerFile]);
+                        disp(['The callerFile is : ', callerFile]);
                     end
                 end
             end
@@ -53,13 +53,13 @@ function changeCurrentFolderToScriptFolder(verbose)
             % 使用 fileparts 解析目录
             [scriptFolder, ~, ~] = fileparts(callerFile);
             if verbose
-                disp(['解析后的目录: ', scriptFolder]);
+                disp(['Folders: ', scriptFolder]);
             end
             
             if isempty(scriptFolder)
                 scriptFolder = pwd;
                 if verbose
-                    disp('解析后的目录为空，使用当前目录作为工作目录。');
+                    disp('The script folder is empty, using the current directory as the working directory.');
                 end
             end
         end
@@ -70,20 +70,19 @@ function changeCurrentFolderToScriptFolder(verbose)
         try
             cd(scriptFolder);
             if verbose
-                disp(['成功切换到目录: ', scriptFolder]);
+                disp(['change to current folder successfully: ', scriptFolder]);
             end
         catch ME
-            warning('无法切换到目录 "%s": %s。保持当前目录不变。', scriptFolder, ME.message);
+            warning('Cannot change to folder "%s": .Holder the folder.', scriptFolder, ME.message);
             scriptFolder = pwd;
         end
     else
         scriptFolder = pwd;
         if verbose
-            disp('目录路径为空，使用当前目录作为工作目录。');
-        end
+            disp('The script folder is empty, using the current directory as the working directory.');
     end
 
     if verbose
-        disp(['当前工作目录: ', pwd]);
+        disp(['Current folder: ', pwd]);
     end
 end

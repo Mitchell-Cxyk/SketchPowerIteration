@@ -4,13 +4,14 @@ lat = ncread(filename, 'lat');
 lon = ncread(filename, 'lon');
 changeCurrentFolderToScriptFolder();
 T=110;
-load(strcat("dataNewPara/SingularVectorPoly42_",num2str(T),"_",num2str(1),".mat"));
+load(strcat("dataNewPara/SingularVectorPoly68_",num2str(T),"_",num2str(1),".mat"));
 if ~exist('U')||~exist('S')||~exist('V')
     load("dataMatrixS100.mat");
 end
 if ~exist('dataMatrix')
     load('dataMatrix.mat');
 end
+mkdir('worldmap');
 %%
 % Z = ncread(filename, 'air');
 % Z=Z(:,:,1);

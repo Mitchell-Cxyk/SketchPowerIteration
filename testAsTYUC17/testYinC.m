@@ -1,26 +1,31 @@
-function testYinC(decay,decayRate,r)
+function testYinC(decay,decayRate,varargin)
     addpath('../');
+    fileName=['data/',decay,'_',num2str(decayRate),'_fixedW1_YinC_fp.mat'];
+    if ~exist(fileName)
+    r=10;
+    if length(varargin)>=1
+        r=varargin{1};
+    end
     % Store the data
     MentoCarloNum=5;
     A=GenerateData(1000,1000,decay,decayRate,10);
-     fileName=['data/',decay,'_',num2str(decayRate),'_fixedW1_YinC_fp.mat'];
-   TlistPre=load(fileName,'Tlist');
-    TlistPre=TlistPre.Tlist;
-    errListPre=load(fileName,'errList');
-    errListPre=errListPre.errList;
+   %   fileName=['data/',decay,'_',num2str(decayRate),'_fixedW1_YinC_fp.mat'];
+   % TlistPre=load(fileName,'Tlist');
+    % TlistPre=TlistPre.Tlist;
+    % errListPre=load(fileName,'errList');
+    % errListPre=errListPre.errList;
     %set the Tlist
-   Tlist=24:2:40;
-    Tlist=[11:2:23,Tlist];
+   Tlist=24:2:60;
     Tlist=[Tlist,60:5:80];
     Tlist=[Tlist,90:10:150];
-    Tlist1=Tlist;
-    [~,indexPre]=ismember(TlistPre,Tlist);
-    index=setdiff(1:numel(Tlist),indexPre);
-    Tlist=setdiff(Tlist,TlistPre);
+    % Tlist=Tlist;
+    % [~,indexPre]=ismember(TlistPre,Tlist);
+    % index=setdiff(1:numel(Tlist),indexPre);
+    % Tlist=setdiff(Tlist,TlistPre);
     % Tlist=[Tlist,160:20:220];
     iterlist=[1,2,3,0];
-    errList=zeros(numel(Tlist),numel(iterlist), Tlist1(end)+1, Tlist1(end)+1);
-    errList1=zeros(numel(Tlist1),numel(iterlist), Tlist1(end)+1, Tlist1(end)+1);
+    errList=zeros(numel(Tlist),numel(iterlist), Tlist(end)+1, Tlist(end)+1);
+    errList1=zeros(numel(Tlist),numel(iterlist), Tlist(end)+1, Tlist(end)+1);
     storeList=errList;
     for iterT=1:numel(Tlist)
         decay
@@ -58,13 +63,14 @@ function testYinC(decay,decayRate,r)
     end
     
     errList = storeList / MentoCarloNum;
-     errList1(indexPre,:,:,:)=errListPre;
-    errList1(index,:,:,:)=errList;
+    %  errList1(indexPre,:,:,:)=errListPre;
+    % errList1(index,:,:,:)=errList;
     errList=errList1;
-    Tlist=Tlist1;
-    fileName=['data/',decay,'_',num2str(decayRate),'_fixedW1_YinC_fp.mat'];
+    % Tlist=Tlist;
+    
     save(fileName,"errList","Tlist");
     end
+end
     % Plot results
     % for iterq=1:numel(iterlist)
     %     figure;

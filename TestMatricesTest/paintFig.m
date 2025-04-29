@@ -1,7 +1,6 @@
 changeCurrentFolderToScriptFolder();
-if ~exist('figure','dir')
-    mkdir('figure');
-end
+
+mkdir('figure');
 figure;
 paintDifferentDistribution('lowrank',0.0001);
 xlim([30,150]);

@@ -1,5 +1,5 @@
 
-r=10; T=300; m=10512; n=28144;decay='poly';decayRate=0.42;MenteCarloNum=10;
+r=10; T=300; m=10512; n=28144;decay='poly';decayRate=0.68;MenteCarloNum=10;
 for T=30:20:290
     for iterMento=1:MenteCarloNum
 s=floor(ParameterGuide(n,T,r,decay,decayRate,m/n));
@@ -31,7 +31,7 @@ Y=dataMatrix*randn(size(dataMatrix,2),s);
 BB=QQ'*dataMatrix;
 [UU,SS,VV]=svd(BB,'econ');
 UU=QQ*UU;
-save(['dataNewPara/SingularVectorPoly42_',num2str(T),'_',num2str(iterMento),'.mat'],"LowRankApprox","LowRankApprox1","UU","SS","VV","T",'-v7.3');
+save(['dataNewPara/SingularVectorPoly68_',num2str(T),'_',num2str(iterMento),'.mat'],"LowRankApprox","LowRankApprox1","UU","SS","VV","T",'-v7.3');
     end
 end
 

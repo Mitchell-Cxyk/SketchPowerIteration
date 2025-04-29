@@ -9,7 +9,7 @@ load("dataMatrixS100.mat");
 MentoCarloNum=5;
 for iter=1:numel(Tlist)
     for iterMento=1:MentoCarloNum
-    load(['dataNewPara/SingularVectorPoly42_',num2str(Tlist(iter)),'_',num2str(iterMento),'.mat']);
+    load(['dataNewPara/SingularVectorPoly68_',num2str(Tlist(iter)),'_',num2str(iterMento),'.mat']);
     
     % load(['data/SingularVectorPolyYinC_',num2str(Tlist(iter)),'_',num2str(iterMento),'.mat']);
     ErrorSPS=abs(LowRankApprox.U)-abs(U(:,1:size(LowRankApprox.U,2)));

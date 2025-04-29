@@ -1,7 +1,7 @@
 changeCurrentFolderToScriptFolder();
-if ~exist('figure','dir')
-    mkdir('figure');
-end
+
+mkdir('figure');
+
 figure;
 paintStreamingSPI('lowrank',0.0001);
 xlim([30,150]);
@@ -37,8 +37,9 @@ saveas(gcf,'figure/exp_0.1.fig');
 figure;
 paintStreamingSPI('exp',0.5);
 xlim([24,65]);
-saveas(gcf,'figure/exp_0.5.fig');
 ylim([1e-8,1e2]);
+saveas(gcf,'figure/exp_0.5.fig');
+
 
 
 
