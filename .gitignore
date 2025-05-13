@@ -36,7 +36,7 @@ fast_rangefinder.pdf
 *.zip
 GxuLevel20.fig
 GxuLevel_20.tif
-
+^.fig
 # Editor and IDE files
 *.swp
 *~
