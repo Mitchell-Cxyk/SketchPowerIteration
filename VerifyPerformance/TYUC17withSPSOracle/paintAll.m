@@ -1,5 +1,7 @@
 changeCurrentFolderToScriptFolder();
-mkdir('figure');
+if ~exist('figure','dir')
+    mkdir('figure');
+end
 figure;
 paintOracle1('lowrank',0.0001);
 xlim([30,150]);

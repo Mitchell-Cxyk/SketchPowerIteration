@@ -53,8 +53,8 @@ switch lower(decayType)
 
     case 'poly'
         % Polynomial decay: s_i = i^(-decayRate)
-        idx = startIdx:length(s);
-        s(idx) = (idx').^(-decayRate);
+        idx = startIdx:length(s);idxcompute=idx-startIdx+2;
+        s(idx) = (idxcompute').^(-decayRate);
         S=diag(s);
         
     case 'exp'

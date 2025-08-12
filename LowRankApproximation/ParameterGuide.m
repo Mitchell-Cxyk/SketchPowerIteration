@@ -45,7 +45,7 @@ elseif strcmp(decay,'poly')
     elseif decayRate>1/2+epsilon
         s=max(r, ((2*decayRate - 1)*(T/2 + 1) - (c + 1)) / (2*(c + 1)*decayRate));
     else
-        xx=-((T+2*c)/(2*(c+1)))/(lambertw(-1,-(T+2*c)/(2*(c+1)*n*exp(1))))-1;
+        xx=-((T+2*c)/(1*(c+1)))/(lambertw(-1,-(T+2*c)/(2*(c+1)*n*exp(1))))-1;
         s=min(max(xx,r),T/4);
     end
 else

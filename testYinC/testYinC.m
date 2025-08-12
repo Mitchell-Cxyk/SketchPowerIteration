@@ -1,7 +1,7 @@
 function testYinC(decay,decayRate)
     addpath('../');
     % Store the data
-    MentoCarloNum=20;
+    MentoCarloNum=1;
     A=GenerateData(1000,1000,decay,decayRate,10);
     r=10;
     %set the Tlist
@@ -45,7 +45,7 @@ function testYinC(decay,decayRate)
                 
             end
         end
-        storeList=storeList+errList;
+        storeList(iterT,:,:,:)=storeList(iterT,:,:,:)+errList(iterT,:,:,:);
     end
     end
     
