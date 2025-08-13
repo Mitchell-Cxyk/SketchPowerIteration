@@ -43,7 +43,7 @@ elseif strcmp(decay,'poly')
     if decayRate<1/2-epsilon
         s=r;
     elseif decayRate>1/2+epsilon
-        s=max(r, ((2*decayRate - 1)*(T/2 + 1) - (c + 1)) / (2*(c + 1)*decayRate));
+        s=max(r, ((2*decayRate - 1)*(T/2.2 + 1) - (c + 1)) / (2*(c + 1)*decayRate)+5);
     else
         xx=-((T+2*c)/(1*(c+1)))/(lambertw(-1,-(T+2*c)/(2*(c+1)*n*exp(1))))-1;
         s=min(max(xx,r),T/4);
@@ -51,4 +51,5 @@ elseif strcmp(decay,'poly')
 else
     error('Unknown decay type');
 end
+s=floor(s);
 end

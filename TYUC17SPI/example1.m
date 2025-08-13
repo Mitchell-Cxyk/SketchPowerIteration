@@ -1,6 +1,7 @@
 changeCurrentFolderToScriptFolder;
 decay='poly';
-decayRateList=[0.5,1,2];
+% decayRateList=[0.5,1,2];
+decayRateList=[0.5,2];
 for iter=1:numel(decayRateList)
     decay
     decayRate=decayRateList(iter)

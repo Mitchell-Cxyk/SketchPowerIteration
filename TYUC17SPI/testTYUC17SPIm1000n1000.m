@@ -1,7 +1,7 @@
 function testTYUC17SPIm1000n1000(decay,decayRate)
 addpath('../');
 % Store the data
-MentoCarloNum=1;
+MentoCarloNum=10;
 A=GenerateData(1000,1000,decay,decayRate,10);
 r=10;
 Tlist=24:2:40;
@@ -41,7 +41,7 @@ for iterMento=1:MentoCarloNum
                     % lowrankSketch = lowrankSketch.ModifySketch();
                     for iterq=1:numel(iterlist)
                     if iterlist(iterq)==0
-                        % lowrankSketch=Sketch('A',A,'r',r,'s',s,'l',l,'d',d,'distribution','sparsesign','iterationNum',0,'mixedPrecision',0,'fixedW',0);
+                        lowrankSketch=Sketch('A',A,'r',r,'s',s,'l',l,'d',d,'distribution','sparsesign','iterationNum',0,'mixedPrecision',0,'fixedW',0);
                         lowrankSketch.mixedPrecision=0;
                         lowrankSketch.iterationNum=iterlist(iterq);
                     else
@@ -58,13 +58,13 @@ for iterMento=1:MentoCarloNum
             
                 end
         end
-    % storeList=storeList+errList;
-    % storeListSpec=storeListSpec+errListSpec;
+    storeList(iterT,:,:,:)=storeList(iterT,:,:,:)+errList(iterT,:,:,:);
+    storeListSpec(iterT,:,:,:)=storeListSpec(iterT,:,:,:)+errListSpec(iterT,:,:,:);
 end
 end
 
-% errList = storeList / MentoCarloNum;
-% errListSpec=storeListSpec/MentoCarloNum;
+errList = storeList / MentoCarloNum;
+errListSpec=storeListSpec/MentoCarloNum;
 fileName=['data/',decay,'_',num2str(decayRate),'_TYUC17SPIStandard.mat'];
 save(fileName,"errList","errListSpec","Tlist");
 end

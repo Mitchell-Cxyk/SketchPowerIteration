@@ -12,7 +12,20 @@ classdef LowRankApproxmation < handle
     methods
         function obj = LowRankApproxmation(SketchObj)
             obj.iterationNum=SketchObj.iterationNum;
-            Y=LowRankApproxmation.sketchPower(SketchObj.Y,SketchObj.C,SketchObj.iterationNum);
+            if SketchObj.mixedPrecision==1
+                Y=single(SketchObj.Y);
+                W=single(SketchObj.W);
+                C=single(SketchObj.C);
+            elseif SketchObj.mixedPrecision==2
+                Y=half(SketchObj.Y);
+                W=half(SketchObj.W);
+                C=half(SketchObj.C);
+            else
+                Y=SketchObj.Y;
+                W=SketchObj.W;
+                C=SketchObj.C;
+            end
+            Y=LowRankApproxmation.sketchPower(Y,C,SketchObj.iterationNum);
             Y=double(Y);
             [obj.Q,~]=qr(Y,0);
             if SketchObj.fixedW==1
