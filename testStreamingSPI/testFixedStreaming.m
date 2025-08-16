@@ -1,7 +1,7 @@
 function testFixedStreaming(decay,decayRate)
 addpath('../');
 % Store the data
-MentoCarloNum=4;
+MentoCarloNum=10;
 A=GenerateData(1000,1000,decay,decayRate,10);
 [m,n]=size(A);
 r=10;

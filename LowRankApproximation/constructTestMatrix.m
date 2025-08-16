@@ -59,8 +59,7 @@ switch distribution
         S = sign(sprandn(m, n, sparsity));  % Creates sparse random matrix directly
     
     case 'sparsesign'
-        sparsity = 0.01;  % 10% non-zero entries
-        S = sign(sprandn(m, n, sparsity));  % Creates sparse random matrix directly
+        S=rand_sign_sparse_shortside(m,n);
     otherwise
         error('Unknown distribution type. Valid options are: Gaussian, Rademacher, CountSketch, CountsketchColumn, CountsketchRow, sparseRademacher.');
 end

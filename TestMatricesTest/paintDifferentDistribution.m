@@ -12,6 +12,11 @@ filename=[decay,'_',num2str(decayRate),'_single_fp_CountSketch.mat'];
 load(filename);
 CountSketchError=errList;
 
+filename=[decay,'_',num2str(decayRate),'_single_fp_SparseSign.mat'];
+load(filename);
+SparseSignError=errList;
+
+
 
 
 filename=[decay,'_',num2str(decayRate),'_single_fp_Rademacher.mat'];
@@ -34,6 +39,8 @@ pointSetYTYUCYinCW0=zeros(4,numel(Tlist));
 ZRademacher=zeros(4,numel(Tlist));
 pointSetYTYUCYinCW1=zeros(4,numel(Tlist));
 ZCountSketch=zeros(4,numel(Tlist));
+pointSetYSparseSign=zeros(4,numel(Tlist));
+ZSparseSign=zeros(4,numel(Tlist));
 pointSetYStreaming=zeros(4,numel(Tlist));
 ZSparseRademacher=zeros(4,numel(Tlist));
 xi=zeros(4,numel(Tlist));
@@ -114,6 +121,30 @@ for iterT=1:numel(Tlist)
         end
     end
 
+     for iter=1:4
+        if iterlist(iter)<0
+            xestimate=ParameterGuide(n,T,r,decay,decayRate);
+            % iterq,iterT
+            pointSetY(iter,iterT)=xestimate;
+            pointSetZ(iter,iterT)=max(errList(iterT,1,floor(xestimate),:));
+        else
+        errList2=SparseSignError (iterT,iter,:,:);
+        errList2 = squeeze(errList2); % Convert to 61x61 matrix if necessary
+
+        % Set zero elements to Inf to exclude them from the minimum search
+        errList2(errList2 == 0) = Inf;
+        errList2(floor(T/2):end,:)=Inf;
+        % Find the minimum value and its position
+        [minValue, linearIndex] = min(errList2(:));
+        [row, col] = ind2sub(size(errList2), linearIndex);
+        s1=min(row,col);
+        
+   
+    pointSetYSparseSign(iter,iterT)=s1;
+   ZSparseSign(iter,iterT)=minValue;
+        end
+    end
+
     for iter=1:4
         if iterlist(iter)<0
             xestimate=ParameterGuide(n,T,r,decay,decayRate);
@@ -139,8 +170,8 @@ for iterT=1:numel(Tlist)
     end
    
 end
-ZMatrix=[ZGaussian(1,:);ZRademacher(1,:);ZCountSketch(1,:);ZSparseRademacher(1,:)];
-fig=paintFunc(@semilogy,Tlist,ZMatrix,{'-','--',':', '-.'},'DisplayName',{'Gaussian','Rademacher','CountSketch','Sparse'});
+ZMatrix=[ZGaussian(1,:);ZRademacher(1,:);ZCountSketch(1,:);ZSparseSign(1,:);ZSparseRademacher(1,:)];
+fig=paintFunc(@semilogy,Tlist,ZMatrix,{'-','--',':', '-.','-'},'DisplayName',{'Gaussian','Rademacher','CountSketch','SparseSign','SparseRademacher'});
 set(get(gca, 'XLabel'), 'String', 'Storage budget T:');
 set(get(gca, 'YLabel'), 'String', 'Relative Frobenius error:');
 xlim([32,150]);

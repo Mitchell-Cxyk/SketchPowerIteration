@@ -1,7 +1,7 @@
 function testYinC(decay,decayRate)
     addpath('../');
     % Store the data
-    MentoCarloNum=1;
+    MentoCarloNum=10;
     A=GenerateData(1000,1000,decay,decayRate,10);
     r=10;
     %set the Tlist
@@ -13,12 +13,16 @@ function testYinC(decay,decayRate)
     iterlist=[1,2,3,0];
     errList=zeros(numel(Tlist),numel(iterlist), Tlist(end)+1, Tlist(end)+1);
     storeList=errList;
+    storeListSpec=errList;
+    errListSpec=errList;
     for iterT=1:numel(Tlist)
         decay
         decayRate
         T=Tlist(iterT)
-    [U,S,V]=tsvd(A,r);
-    normAbest=norm(A-U*S*V','fro');
+    [U,S,V]=tsvd(A,r+1);
+normASpectralbest=S(r+1,r+1);
+U=U(:,1:r);V=V(:,1:r);S=S(1:r,1:r);
+normAbest=norm(A-U*S*V','fro');
     for iterMento=1:MentoCarloNum
         lowrankSketchbackup=Sketch('A',A,'r',r,'s',T,'l',T,'d',T,'distribution','sparsesign','iterationNum',1,'mixedPrecision',1,'fixedW',1,'Y_in_C',1);
         lowrankSketchbackup1=Sketch('A',A,'r',r,'s',T,'l',T,'d',T,'distribution','sparsesign','iterationNum',0,'mixedPrecision',0,'fixedW',1,'Y_in_C',1);
@@ -40,12 +44,15 @@ function testYinC(decay,decayRate)
                         lowrankSketch = lowrankSketch.ModifySketch();
                         lowrankApprox = LowRankApproxmation(lowrankSketch);
                         errlowrank = norm(A - lowrankApprox.U * lowrankApprox.S * lowrankApprox.V', 'fro')/normAbest-1;
+                        errlowrankSpectral=norm(A - lowrankApprox.U * lowrankApprox.S * lowrankApprox.V')/normASpectralbest-1;
                         errList(iterT,iterq, s, d) = errlowrank;
+                        errListSpec(iterT,iterq, s, d)=errlowrankSpectral;
                     end
                 
             end
         end
         storeList(iterT,:,:,:)=storeList(iterT,:,:,:)+errList(iterT,:,:,:);
+    storeListSpec(iterT,:,:,:)=storeListSpec(iterT,:,:,:)+errListSpec(iterT,:,:,:);
     end
     end
     
