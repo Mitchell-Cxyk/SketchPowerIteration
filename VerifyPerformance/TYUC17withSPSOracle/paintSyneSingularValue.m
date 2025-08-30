@@ -1,6 +1,6 @@
 % paintList={{'lowrank',0.1,0.01,0.0001},{'poly',0.5,1,2},{'exp',0.01,0.1,0.5}};
 % paintList={{'lowrank',0.1,0.01,0.0001}};
-paintList={{'lowrank',0.1},{'poly',1},{'exp',0.01}};
+paintList={{'lowrank',0.1},{'poly',3},{'exp',0.01}};
 % paintList={{'poly',1}};
 % paintList={{'exp',0.5}};
 % paintList={{'poly',0.1,0.5,1,2}};
@@ -21,21 +21,23 @@ for iter=1:numel(paintList)
    for iter2=2:numel(paintVec)
        paintOrder=paintOrder+1;
        [A,S]=GenerateData(m,n,paintVec{1},paintVec{iter2},r);
+       S=S';
        SList(paintOrder,:)=S;
        SDecayList(paintOrder,:)=calculateDecayRates(S)';
        
        Omega=constructTestMatrix(n,s,'Gaussian');
        AS=A*Omega;
        S1=svd(AS,"econ","vector");
-       SketchList(paintOrder,:)=S1/S1(r+1)*S(r+1);
+       S1=S1';
+       % SketchList(paintOrder,:)=S1/S1(r+1)*S(r+1);
        % SketchList(paintOrder,:)=S1;
        DecayS1=calculateDecayRates(S1);
        SketchDecayList(paintOrder,:)=DecayS1;
        figure;
-       paintFunc(@semilogy,r+1:s,SList(iter,r+1:s),{'-'},'DisplayName',{'Origin'},'LineWidthList',{2});
-       hold on;
-       paintFunc(@semilogy,r+1:s,SketchList(iter,r+1:end),{'--'},'DisplayName',{'Sketch'},'LineWidthList',{2});
-       saveas(gcf,strcat('./figure/SketchSingularValue/SketchSingularValue',paintVec{1},'_',num2str(paintVec{iter2}),'.fig'));
+       paintFunc(@semilogy,r+1:s,S1(r+1:s)./S(r+1:s),{'-'},'DisplayName',{'Origin'},'LineWidthList',{2});
+       % hold on;
+       % paintFunc(@semilogy,r+1:s,SketchList(iter,r+1:end),{'--'},'DisplayName',{'Sketch'},'LineWidthList',{2});
+       % saveas(gcf,strcat('./figure/SketchSingularValue/SketchSingularValue',paintVec{1},'_',num2str(paintVec{iter2}),'.fig'));
    end
 end
 % figure(1);

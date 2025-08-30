@@ -1,0 +1,25 @@
+errList=zeros(2,300);
+r=5;Tlist=[80,110,140,170];
+sNum=[57,79,101,123];
+iter=4;
+T=Tlist(iter);snum=sNum(iter);
+for s=r:snum
+    s
+    load(['dataBestT/BestT',num2str(T),'_',num2str(s),'.mat']);
+    errList(1,s)=norm(dataMatrix-LowRankApprox.U*LowRankApprox.S*LowRankApprox.V','fro')/normAbest-1;
+    errList(2,s)=norm(dataMatrix-LowRankApprox1.U*LowRankApprox1.S*LowRankApprox1.V','fro')/normAbest-1;
+end
+%%
+errList(errList<=0)=Inf;
+[minSPI,count]=min(errList(1,:));
+[minTYUC17,count2]=min(errList(2,:));
+load(['dataBestT/BestT',num2str(T),'_',num2str(count),'.mat']);
+leftSPI=norm(dataMatrix-LowRankApprox.U*(LowRankApprox.U'*dataMatrix),'fro')/normAbest-1;
+load(['dataBestT/BestT',num2str(T),'_',num2str(count2),'.mat']);
+leftTYUC=norm(dataMatrix-LowRankApprox1.U*(LowRankApprox1.U'*dataMatrix),'fro')/normAbest-1;
+minSPI
+leftSPI
+sqrt((1+minSPI)^2-(1+leftSPI)^2)
+minTYUC17
+leftTYUC
+sqrt((1+minTYUC17)^2-(1+leftTYUC)^2)

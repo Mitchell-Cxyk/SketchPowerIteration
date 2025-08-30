@@ -1,5 +1,5 @@
 changeCurrentFolderToScriptFolder();
-r=3;
+r=5;
 Tlist=270;iterMento=1;
 for iter=1:numel(Tlist)
 load(['dataNewPara/SingularVectorPoly68_',num2str(Tlist(iter)),'_',num2str(iterMento),'.mat']);

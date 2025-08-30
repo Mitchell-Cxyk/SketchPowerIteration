@@ -1,0 +1,31 @@
+terms=[76,109,129,175];
+errList=zeros(2,200);
+T=320;
+for s=10:175
+    s
+    load(['dataBestT/BestTSquare',num2str(T),'_',num2str(s),'.mat']);
+    [~,S11,~]=svdsketch(imageMatrix20000-LowRankApprox.U*LowRankApprox.S*LowRankApprox.V',1e-4,'MaxSubspaceDimension',650);
+    errList(1,s)=S11(1)/S(11,11)-1;
+    [~,S22,~]=svdsketch(imageMatrix20000-LowRankApprox1.U*LowRankApprox1.S*LowRankApprox1.V',1e-4,'MaxSubspaceDimension',650);
+    errList(2,s)=S22(1)/S(11,11)-1;
+end
+save(['dataBestT/T',num2str(T),'_Spec.mat'],'errList');
+%%
+errList(errList<=0)=Inf;
+[minSPISpec,count]=min(errList(1,:));
+[minTYUC17Spec,count2]=min(errList(2,:));
+%%
+load(['dataBestT/BestTSquare',num2str(T),'_',num2str(count),'.mat']);
+minSPIS=norm(imageMatrix20000-LowRankApprox.U*LowRankApprox.S*LowRankApprox.V')/S(11,11)-1;
+leftSPISpec=norm(imageMatrix20000-LowRankApprox.U*(LowRankApprox.U'*imageMatrix20000))/S(11,11)-1;
+rightSPISpec=norm(LowRankApprox.U*(LowRankApprox.U'*imageMatrix20000)-LowRankApprox.U*LowRankApprox.S*LowRankApprox.V')/S(11,11);
+load(['dataBestT/BestTSquare',num2str(T),'_',num2str(count2),'.mat']);
+minTYUC17S=norm(imageMatrix20000-LowRankApprox1.U*LowRankApprox1.S*LowRankApprox1.V')/S(11,11)-1;
+leftTYUCSpec=norm(imageMatrix20000-LowRankApprox1.U*(LowRankApprox1.U'*imageMatrix20000))/S(11,11)-1;
+rightTYUCSpec=norm(LowRankApprox1.U*(LowRankApprox1.U'*imageMatrix20000)-LowRankApprox1.U*LowRankApprox1.S*LowRankApprox1.V')/S(11,11);
+minSPIS
+leftSPISpec
+rightSPISpec
+minTYUC17S
+leftTYUCSpec
+rightTYUCSpec

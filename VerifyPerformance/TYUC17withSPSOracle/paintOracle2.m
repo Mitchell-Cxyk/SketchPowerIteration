@@ -48,6 +48,8 @@ for iterT=1:numel(Tlist)
          pointSetX(iterq,iterT)=T;
         if iterlist(iterq)==-1
             if strcmpi(decay,'poly')&& decayRate==0.5
+                xestimate=ParameterGuide(n,T,r,decay,decayRate);
+            elseif strcmpi(decay,'lowrank') && decayRate==0.1
                 xestimate=TYUC17ParamenterGuide(n,T,r,decay,decayRate);
             else
              xestimate=ParameterGuide(n,T,r,decay,decayRate);

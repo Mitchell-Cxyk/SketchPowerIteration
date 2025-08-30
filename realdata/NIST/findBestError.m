@@ -1,0 +1,21 @@
+errList=zeros(2,200);
+for s=10:76
+    s
+    load(['dataBestT/BestT200_',num2str(s),'.mat']);
+    errList(1,s)=norm(imageMatrix20000-LowRankApprox.U*LowRankApprox.S*LowRankApprox.V','fro')/normAbest-1;
+    errList(2,s)=norm(imageMatrix20000-LowRankApprox1.U*LowRankApprox1.S*LowRankApprox1.V','fro')/normAbest-1;
+end
+%%
+errList(errList<=0)=Inf;
+[minSPI,count]=min(errList(1,:));
+[minTYUC17,count2]=min(errList(2,:));
+load(['dataBestT/BestT200_',num2str(count),'.mat']);
+leftSPI=norm(imageMatrix20000-LowRankApprox.U*(LowRankApprox.U'*imageMatrix20000),'fro')/normAbest-1;
+load(['dataBestT/BestT200_',num2str(count2),'.mat']);
+leftTYUC=norm(imageMatrix20000-LowRankApprox1.U*(LowRankApprox1.U'*imageMatrix20000),'fro')/normAbest-1;
+minSPI
+leftSPI
+sqrt((1+minSPI)^2-(1+leftSPI)^2)
+minTYUC17
+leftTYUC
+sqrt((1+minTYUC17)^2-(1+leftTYUC)^2)
