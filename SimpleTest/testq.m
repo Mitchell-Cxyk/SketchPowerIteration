@@ -1,13 +1,13 @@
-m=1000;m=1000;
-A=GenerateData(m,n,'poly',1,10);
-r=10;l=60;s=20;MentoCarloNum=50;
-
-qlist=[1:10,12:2:20,25:5:100];
+m=1000;n=1000;
+A=GenerateData(m,n,'poly',0.5,10);
+r=10;l=60;s=20;MentoCarloNum=100;
+Phi=randn(n,l);Z=A*Phi;
+qlist=[1:10,12:2:20];
 errF=zeros(MentoCarloNum,numel(qlist));
 errS=zeros(MentoCarloNum,numel(qlist));
 for iter=1:MentoCarloNum
     iter
-    Phi=randn(n,l);Z=A*Phi;
+    % Phi=randn(n,l);Z=A*Phi;
     Omega=randn(n,s);
     Y=A*Omega;
     for iterq=1:numel(qlist)
@@ -22,4 +22,4 @@ for iter=1:MentoCarloNum
         errS(iter,iterq)=norm(A-Q*(Q'*A));
     end
 end
-save('testq2.mat','errF','errS');
+save('testq_poly_0.5FixedPhi.mat','errF','errS');
