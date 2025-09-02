@@ -57,26 +57,26 @@ for iterMento=1:MentoCarloNum
                     lowrankSketch = lowrankSketch.ModifySketch();
                     lowrankApprox = LowRankApproxmation(lowrankSketch);
                     errlowrank = norm(A - lowrankApprox.U * lowrankApprox.S * lowrankApprox.V', 'fro')/normAbest-1;
-                    errlowrankSpec = norm(A - lowrankApprox.U * lowrankApprox.S * lowrankApprox.V')/normASpectralBest-1;
+                    % errlowrankSpec = norm(A - lowrankApprox.U * lowrankApprox.S * lowrankApprox.V')/normASpectralBest-1;
                     errList(iterT,iterq, s, d) = errlowrank;
-                    errListSpec(iterT,iterq, s, d) = errlowrankSpec;
+                    % errListSpec(iterT,iterq, s, d) = errlowrankSpec;
                 end
             
         end
     end
     storeList(iterT,:,:,:)=storeList(iterT,:,:,:)+errList(iterT,:,:,:);
-    storeListSpec(iterT,:,:,:)=storeListSpec(iterT,:,:,:)+errListSpec(iterT,:,:,:);
+    % storeListSpec(iterT,:,:,:)=storeListSpec(iterT,:,:,:)+errListSpec(iterT,:,:,:);
 end
 end
 
 errList = storeList / MentoCarloNum;
-errListSpec=storeListSpec/MentoCarloNum;
+% errListSpec=storeListSpec/MentoCarloNum;
 errList1(indexPre,:,1:size(errListPre,3),1:size(errListPre,4))=errListPre;
     errList1(index,:,:,:)=errList;
     errList=errList1;
     Tlist=Tlist1;
 
-save(fileName,"errList","errListSpec","Tlist");
+save(fileName,"errList","Tlist");
 end
 end
 % Plot results

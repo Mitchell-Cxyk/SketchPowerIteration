@@ -15,7 +15,8 @@ if strcmp(decay,'lowrank')
 elseif strcmp(decay,'exp')
     if decayRate<0.05
         T=T/2;
-        s=max(r+2,floor((T-1)*((sqrt(r*(T-r-2)*(1-2/(T-1)))-(r-1))/(T-2*r-1))));
+        % s=max(r+2,floor((T-1)*((sqrt(r*(T-r-2)*(1-2/(T-1)))-(r-1))/(T-2*r-1))));
+        s=max(r,floor((T-2)/2));
     else
    s=max(r,floor((T-2)/2));
     end

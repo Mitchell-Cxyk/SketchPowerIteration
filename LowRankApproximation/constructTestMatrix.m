@@ -57,6 +57,10 @@ switch distribution
         % Use MATLAB's sparse random function
         sparsity = 0.01;  % 10% non-zero entries
         S = sign(sprandn(m, n, sparsity));  % Creates sparse random matrix directly
+    case 'sparserademacher01'
+    % Use MATLAB's sparse random function
+    sparsity = 0.1;  % 10% non-zero entries
+    S = sign(sprandn(m, n, sparsity));  % Creates sparse random matrix directly
     
     case 'sparsesign'
         S=rand_sign_sparse_shortside(m,n);
