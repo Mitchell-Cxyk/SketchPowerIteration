@@ -11,6 +11,8 @@ for iter=1:numel(Tlist)
     for iterMento=1:MentoCarloNum
     load(['dataNewPara/SingularVectorPoly68_',num2str(Tlist(iter)),'_',num2str(iterMento),'.mat']);
     
+    [U,S,V]=
+
     % load(['data/SingularVectorPolyYinC_',num2str(Tlist(iter)),'_',num2str(iterMento),'.mat']);
     ErrorSPS=abs(LowRankApprox.U)-abs(U(:,1:size(LowRankApprox.U,2)));
     ErrorTYUC17=abs(LowRankApprox1.U)-abs(U(:,1:size(LowRankApprox1.U,2)));

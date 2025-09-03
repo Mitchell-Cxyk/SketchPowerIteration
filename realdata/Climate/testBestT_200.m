@@ -3,7 +3,7 @@ r=5; T=140; m=10512; n=28144;decay='poly';decayRate=0.68;MenteCarloNum=10;
 errList=zeros(4,290);
 errListSpec=zeros(4,290);
 % dataMatrix=dataMatrix';
-for T=140
+for T=190
 for s=10:T
 s
 % s=floor(ParameterGuide(n,T,r,decay,decayRate,m/n));
