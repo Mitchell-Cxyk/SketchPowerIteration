@@ -1,5 +1,5 @@
 m=1000;n=1000;
-A=GenerateData(m,n,'poly',0.5,10);
+A=GenerateData(m,n,'exp',0.1,10);
 r=10;l=60;s=20;MentoCarloNum=50;d=l-s;
 Phi=randn(n,l);Z=A*Phi;Psi=randn(d,m);W=Psi*A;
 qlist=[1:10,12:2:20];
@@ -25,4 +25,9 @@ for iter=1:MentoCarloNum
         errS(iter,iterq)=norm(A-U*S*V');
     end
 end
-save('testq_poly_0.5FixedPhiPsi.mat','errF','errS');
+save('testq_exp_0.1FixedPhiPsi.mat','errF','errS');
+[UU,SS,VV]=tsvd(A,r);
+normAbest=norm(A-UU*SS*VV','fro');
+relativeErrF=errF./normAbest-1;
+data=formatScatterData(qlist(1:10)',relativeErrF(:,1:10)');
+createAcademicScatter(data,'BoundaryType','shaded','ShowMeanLine',true,'XLabel','Iteration Number','YLabel','Relative Frobenius Error');
