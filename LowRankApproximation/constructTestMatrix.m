@@ -1,4 +1,4 @@
-function S = constructTestMatrix(m,n,distribution)
+function S = constructTestMatrix(m,n,distribution,varargin)
 % constructTestMatrix Generates different types of test matrices
 %
 % Inputs:
@@ -56,6 +56,9 @@ switch distribution
     case 'sparserademacher'
         % Use MATLAB's sparse random function
         sparsity = 0.01;  % 10% non-zero entries
+        if nargin>=1
+            sparsity=varargin{1};
+        end
         S = sign(sprandn(m, n, sparsity));  % Creates sparse random matrix directly
     case 'sparserademacher01'
     % Use MATLAB's sparse random function
@@ -65,7 +68,19 @@ switch distribution
     case 'sparsesign'
         S=rand_sign_sparse_shortside(m,n);
     otherwise
+        if contains(distribution,'sparserademacher')
+            str=erase(distribution,'sparserademacher');
+            if str(1) == '0'
+            tail = str(2:end);
+            num = str2double(['0.' tail]);
+            else
+                num = str2double(str);
+            end
+            sparsity=num;
+            S = sign(sprandn(m, n, sparsity));
+        else
         error('Unknown distribution type. Valid options are: Gaussian, Rademacher, CountSketch, CountsketchColumn, CountsketchRow, sparseRademacher.');
-end
+        end
+        end
 
 end

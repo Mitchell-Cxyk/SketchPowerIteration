@@ -1,6 +1,6 @@
 decayList={{'lowrank',0.0001,0.01,0.1},{'poly',0.5,1,2},{'exp',0.01,0.1,0.5}};
 % distributionList={'Gaussian','Rademacher','CountSketch','SparseRademacher','SparseSign'};
-distributionList={'SparseRademacher01'};
+distributionList={'SparseRademacher002'};
 for distributionIter=1:length(distributionList)
     distribution=distributionList{distributionIter}
     for iter1=1:numel(decayList)
