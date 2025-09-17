@@ -21,6 +21,7 @@ elseif strcmp(decay,'exp')
    s=max(r,floor((T-2)/2));
     end
 elseif strcmp(decay,'poly')
+    % T=T/0.9;
     s=max(r+2,floor((T-2)/3));
 else
     error('Unknown decay type');
