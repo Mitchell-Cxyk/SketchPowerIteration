@@ -1,7 +1,7 @@
-m=30000;n=20000;
-% A=randn(m,n);
-T=5000;r=100;s=ParameterGuide(n,T,r,'lowrank',0.1);l=T;d=T-s;
-s1=TYUC17ParamenterGuide(n,T,r,'lowrank',0.1);d1=T-s1;
+m=20000;n=30000;
+A=randn(m,n);
+T=1000;r=100;s=ParameterGuide(n,T,r,'poly',1);l=T;d=T-s;
+s1=TYUC17ParamenterGuide(n,T,r,'poly',1);d1=T-s1;
 tic;
 Phi=rademacher_sparse(n,l,n*l*0.02);
 Omega1=rademacher_sparse(n,s,n*s*0.02);
