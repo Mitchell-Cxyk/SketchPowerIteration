@@ -67,6 +67,13 @@ switch distribution
     
     case 'sparsesign'
         S=rand_sign_sparse_shortside(m,n);
+    case 'sparseiid'
+        sparsity=0.01;
+        if nargin>=4
+            sparsity=varargin{1};
+        end
+        randmask=rand(m,n)<sparsity;
+        S=randmask.*sign(randn(m,n));
     otherwise
         if contains(distribution,'sparserademacher')
             str=erase(distribution,'sparserademacher');

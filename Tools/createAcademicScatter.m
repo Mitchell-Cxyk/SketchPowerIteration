@@ -74,41 +74,65 @@ function fig_handle = createAcademicScatter(data, varargin)
     % --- 3. Plot Boundary/Shading (Original Logic Restored) ---
     if ~strcmpi(options.BoundaryType, 'none') && numel(all_x_cleaned) >= 3
         switch lower(options.BoundaryType)
-            case 'shaded'
+                       case 'shaded'
+                % ---- 使用 discretize 替代 histc，并用“边界扩展到箱边缘”的方式绘制 ----
                 min_x_val = min(all_x_cleaned);
                 max_x_val = max(all_x_cleaned);
+
+                % 等宽分箱（NumBins 个箱，对应 NumBins+1 个边界）
                 bin_edges = linspace(min_x_val, max_x_val, options.NumBins + 1);
-                bin_edges(end) = max_x_val; 
-                [~, bin_indices] = histc(all_x_cleaned, bin_edges); % Using the original histc
+
+                % discretize: 返回 1..NumBins，且包含右端点到最后一箱
+                bin_indices = discretize(all_x_cleaned, bin_edges);
+
+                % 逐箱统计上下边界
                 upper_boundary = NaN(1, options.NumBins);
                 lower_boundary = NaN(1, options.NumBins);
-                bin_centers_for_plot = NaN(1, options.NumBins);
                 for k = 1:options.NumBins
-                    points_in_bin_idx = (bin_indices == k);
-                    if any(points_in_bin_idx)
-                        y_in_bin = all_y_cleaned(points_in_bin_idx);
-                        x_in_bin = all_x_cleaned(points_in_bin_idx);
-                        upper_boundary(k) = max(y_in_bin);
-                        lower_boundary(k) = min(y_in_bin);
-                        bin_centers_for_plot(k) = mean(x_in_bin);
+                    idx = (bin_indices == k);
+                    if any(idx)
+                        yk = all_y_cleaned(idx);
+                        upper_boundary(k) = max(yk);
+                        lower_boundary(k) = min(yk);
                     end
                 end
-                
-                valid_bins = ~isnan(bin_centers_for_plot); 
-                bin_centers_for_plot = bin_centers_for_plot(valid_bins);
-                upper_boundary = upper_boundary(valid_bins);
-                lower_boundary = lower_boundary(valid_bins);
-                
-                if numel(bin_centers_for_plot) < 2
-                     warning('Not enough valid bins to draw shaded boundary.');
+
+                % 仅保留非空箱
+                valid_bins = ~isnan(upper_boundary) & ~isnan(lower_boundary);
+                if ~any(valid_bins)
+                    warning('Not enough valid bins to draw shaded boundary.');
                 else
-                    fill_x = [bin_centers_for_plot, fliplr(bin_centers_for_plot)];
-                    fill_y = [upper_boundary, fliplr(lower_boundary)];
+                    % 用“箱中心”做主体曲线，但在两端用“箱边界”补齐，保证覆盖到最左/最右
+                    bin_centers = (bin_edges(1:end-1) + bin_edges(2:end)) / 2;
+
+                    x_core  = bin_centers(valid_bins);
+                    yU_core = upper_boundary(valid_bins);
+                    yL_core = lower_boundary(valid_bins);
+
+                    first_idx = find(valid_bins, 1, 'first');
+                    last_idx  = find(valid_bins,  1, 'last');
+
+                    % 两端延伸到箱边缘（左端是 first_idx 的左边界，右端是 last_idx 的右边界）
+                    left_edge  = bin_edges(first_idx);
+                    right_edge = bin_edges(last_idx + 1);
+
+                    % 在线条和填充上都做端点补齐（避免两端收缩半个箱宽）
+                    x_line = [left_edge, x_core, right_edge];
+                    yU_line = [upper_boundary(first_idx), yU_core, upper_boundary(last_idx)];
+                    yL_line = [lower_boundary(first_idx), yL_core, lower_boundary(last_idx)];
+
+                    % 先画填充，再画上下边界线
+                    fill_x = [x_line, fliplr(x_line)];
+                    fill_y = [yU_line, fliplr(yL_line)];
                     fill(ax, fill_x, fill_y, options.ShadedColor, ...
                          'FaceAlpha', options.ShadedAlpha, 'EdgeColor', 'none');
-                    plot(ax, bin_centers_for_plot, upper_boundary, 'Color', options.BoundaryColor, 'LineWidth', options.BoundaryWidth);
-                    plot(ax, bin_centers_for_plot, lower_boundary, 'Color', options.BoundaryColor, 'LineWidth', options.BoundaryWidth);
+
+                    plot(ax, x_line, yU_line, 'Color', options.BoundaryColor, ...
+                        'LineWidth', options.BoundaryWidth);
+                    plot(ax, x_line, yL_line, 'Color', options.BoundaryColor, ...
+                        'LineWidth', options.BoundaryWidth);
                 end
+
             
             case 'convex'
                 k = convhull(all_x_cleaned, all_y_cleaned);

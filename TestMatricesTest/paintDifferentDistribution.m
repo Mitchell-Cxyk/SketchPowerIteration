@@ -4,7 +4,7 @@ filename=[decay,'_',num2str(decayRate),'_single_fp_Gaussian.mat'];
 loadData=load(filename);
 GaussianError=loadData.errList;
 
-filename=[decay,'_',num2str(decayRate),'_single_fp_SparseRademacher.mat'];
+filename=[decay,'_',num2str(decayRate),'_single_fp_SparseRademacher002.mat'];
 load(filename);
 SparseRademacherError=errList;
 

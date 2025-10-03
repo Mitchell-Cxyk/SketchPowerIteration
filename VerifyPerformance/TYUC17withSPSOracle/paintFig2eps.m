@@ -1,6 +1,6 @@
 % 设置文件夹路径
-figFolder = './figure/qFigure'; % 替换为你的 .fig 文件所在文件夹路径
-outputFolder = 'C:\Users\cxyk3\Documents\Paper-LaTeX\SketchPower\figure\Synethetic\qFigure'; % 替换为保存 .eps 文件的文件夹路径
+figFolder = './figure'; % 替换为你的 .fig 文件所在文件夹路径
+outputFolder = 'C:\Users\cxyk3\Documents\Paper-LaTeX\SketchPower\figure\Synethetic'; % 替换为保存 .eps 文件的文件夹路径
 
 % 确保输出文件夹存在
 if ~exist(outputFolder, 'dir')
