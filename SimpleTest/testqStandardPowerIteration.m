@@ -2,8 +2,8 @@ m=1000;n=1000;
 decay='poly';
 decayRate=0.5;
 A=GenerateData(m,n,decay,decayRate,10);
-r=10;l=150;s=20;MentoCarloNum=50;d=150;
-Phi=randn(n,l);Z=A*Phi;Psi=randn(d,m);
+r=10;l=n;s=20;MentoCarloNum=50;d=100;
+Phi=randn(n,l);Z=A;Psi=randn(d,m);
 % Psi=eye(m);
 W=Psi*A;
 qlist=[1:10,12:5:40];
@@ -40,19 +40,18 @@ for iter=1:MentoCarloNum
 end
 [UU,SS,VV]=tsvd(A,r);
 normAbest=norm(A-UU*SS*VV','fro');
-% fileName=['testq_',decay,'_',num2str(decayRate),'FixedPhiPsi.mat'];
-fileName=['testq_',decay,'_',num2str(decayRate),'FixedPhiPsi.mat'];
+fileName=['testq_',decay,'_',num2str(decayRate),'FixedPhiPsiStandard.mat'];
 save(fileName,'errF','errS','errF1','errS1',"normAbest",'A');
 % [UU,SS,VV]=tsvd(A,r);
 % normAbest=norm(A-UU*SS*VV','fro');
 %%
 relativeErrF=errF./normAbest-1;
 data=formatScatterData(qlist',relativeErrF');
-createAcademicScatter(data,'BoundaryType','shaded','ShowMeanLine',true,'ShowMedianLine',true,'YScale','linear','XLabel','Iteration Number','YLabel','Relative Frobenius Error');
+createAcademicScatter(data,'BoundaryType','shaded','ShowMeanLine',true,'YScale','log','XLabel','Iteration Number','YLabel','Relative Frobenius Error');
 % data1=formatScatterData(qlist',errF1');
 % createAcademicScatter(data1,'BoundaryType','shaded','ShowMeanLine',true,'YScale','log','XLabel','Iteration Number','YLabel','Relative Frobenius Error');
 normA=svd(A);normA=normA(r+1);
 relativeErrS=errS./normA-1;
 data=formatScatterData(qlist',relativeErrS');
-createAcademicScatter(data,'BoundaryType','shaded','ShowMeanLine',true,'ShowMedianLine',true,'YScale','linear','XLabel','Iteration Number','YLabel','RelativeSpectral Error');
+createAcademicScatter(data,'BoundaryType','shaded','ShowMeanLine',true,'YScale','log','XLabel','Iteration Number','YLabel','RelativeSpectral Error');
 
