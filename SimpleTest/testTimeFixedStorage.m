@@ -1,30 +1,126 @@
-m=20000;n=30000;
-A=randn(m,n);
-T=1000;r=100;s=ParameterGuide(n,T,r,'poly',1);l=T;d=T-s;
-s1=TYUC17ParamenterGuide(n,T,r,'poly',1);d1=T-s1;
-tic;
-Phi=rademacher_sparse(n,l,n*l*0.02);
-Omega1=rademacher_sparse(n,s,n*s*0.02);
-Z=A*Phi;
-Y1=A*Omega1;
-Y2=Z'*Y1;
-[Q,~]=qr(Y2,'econ');
-Y3=Z*Q;
-[Q1,~]=qr(Y3,'econ');
-Psi=rademacher_sparse(d,m,d*m*0.02);
-W1=Psi*A;
-B=(Psi*Q1)\W1;
-[U,S,V]=tsvd(B,r);
-U=Q1*U;
-t2=toc;
-tic;
-Omega=rademacher_sparse(n,s1,n*s1*0.02);
-Y=A*Omega;
-[Q,~]=qr(Y,'econ');
-Psi=rademacher_sparse(d1,m,d1*m*0.02);
-W=Psi*A;
-B=(Psi*Q)\W;
-[U,S,V]=tsvd(B,r);
-U=Q*U;
-t1=toc;
+%% ===== Two-part timing (no shared steps) with warmup + median-of-N =====
+format short g; rng default;
 
+% ---------- Config ----------
+N = 3;  % 每个步骤重复次数（预热 1 次 + 计时 N 次，取中位数）
+
+% ---------- Problem/setup (不计入两部分计时) ----------
+m = 10000; n = 20000;
+A = randn(m, n);
+T = 1000; r = 100;
+
+s  = ParameterGuide(n, T, r, 'poly', 1);
+l  = T;
+d  = T - s;
+
+s1 = TYUC17ParamenterGuide(n, T, r, 'poly', 1);
+d1 = T - s1;
+
+%% ---------------- Part 1 ----------------
+[tPhi1,   Phi]    = timeit_step(@() rademacher_sparse(n, l, 0.02*n*l), N);
+[tOm1,    Omega1] = timeit_step(@() rademacher_sparse(n, s, 0.02*n*s), N);
+
+[tZ1,     Z]      = timeit_step(@() A * Phi, N);
+[tY1,     Y1]     = timeit_step(@() A * Omega1, N);
+[tY2,     Y2]     = timeit_step(@() Z' * Y1, N);
+
+% === 关键修正：qr 必须接收两个输出，第一输出才是 Q ===
+[tQRY2,   Qp1, ~] = timeit_step(@() qr(Y2, 'econ'), N);
+
+[tY3,     Y3]     = timeit_step(@() Z * Qp1, N);
+[tQRY3,   Q1,  ~] = timeit_step(@() qr(Y3, 'econ'), N);
+
+[tPsi1,   Psi1]   = timeit_step(@() rademacher_sparse(d,  m, 0.02*d*m), N);
+[tW1,     W1]     = timeit_step(@() Psi1 * A, N);
+[tB1,     B1]     = timeit_step(@() (Psi1 * Q1) \ W1, N);
+[tTSVD1,  U1, S1, V1] = timeit_step(@() tsvd(B1, r), N); %#ok<ASGLU>
+[tUup1,   U1]     = timeit_step(@() Q1 * U1, N); %#ok<NASGU>
+
+%% ---------------- Part 2 ----------------
+[tOm2,    Omega]  = timeit_step(@() rademacher_sparse(n, s1, 0.02*n*s1), N);
+[tY,      Y]      = timeit_step(@() A * Omega, N);
+
+% === 同样修正这里的 qr ===
+[tQRY,    Qp2, ~] = timeit_step(@() qr(Y, 'econ'), N);
+
+[tPsi2,   Psi2]   = timeit_step(@() rademacher_sparse(d1, m, 0.02*d1*m), N);
+[tW,      W]      = timeit_step(@() Psi2 * A, N);
+[tB2,     B2]     = timeit_step(@() (Psi2 * Qp2) \ W, N);
+[tTSVD2,  U2, S2, V2] = timeit_step(@() tsvd(B2, r), N); %#ok<ASGLU>
+[tUup2,   U2]     = timeit_step(@() Qp2 * U2, N); %#ok<NASGU>
+
+%% ---------------- Assemble comparison table ----------------
+Step = [
+    "Phi (n×l) generation";
+    "Omega generation";
+    "Z = A * Phi";
+    "Y = A * Omega";
+    "Y2 = Z' * Y (or Y1)";
+    "QR on Y2 / Y";
+    "Y3 = Z * Q (from Y2)";
+    "QR on Y3";
+    "Psi (⋅×m) generation";
+    "W = Psi * A";
+    "Solve B = (Psi*Q)\\W";
+    "TSVD: [U,S,V] = tsvd(B,r)";
+    "U ← Q*U (or Q1*U)";
+    "TOTAL (sum of medians)";
+];
+
+Time_Part1 = [
+    tPhi1;
+    tOm1;
+    tZ1;
+    tY1;
+    tY2;
+    tQRY2;
+    tY3;
+    tQRY3;
+    tPsi1;
+    tW1;
+    tB1;
+    tTSVD1;
+    tUup1;
+    NaN
+];
+
+Time_Part2 = [
+    NaN;
+    tOm2;
+    NaN;
+    tY;
+    NaN;
+    tQRY;
+    NaN;
+    NaN;
+    tPsi2;
+    tW;
+    tB2;
+    tTSVD2;
+    tUup2;
+    NaN
+];
+
+Time_Part1(end) = nansum(Time_Part1(1:end-1));
+Time_Part2(end) = nansum(Time_Part2(1:end-1));
+
+T = table(Step, Time_Part1, Time_Part2);
+disp(T);
+
+%% ===== Helper: warmup + median-of-N timer with output capture =====
+function [tmed, varargout] = timeit_step(fh, N)
+    if nargin < 2 || isempty(N), N = 5; end
+    % 预热
+    fh();
+    ts = zeros(N,1);
+    for i = 1:N
+        t0 = tic;
+        if nargout > 1 && i == N
+            [varargout{1:nargout-1}] = fh(); % 最后一次把结果带出来（含多个输出）
+        else
+            fh();
+        end
+        ts(i) = toc(t0);
+    end
+    tmed = median(ts);
+end
