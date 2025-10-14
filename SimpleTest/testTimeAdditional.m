@@ -1,89 +1,166 @@
-%% Two-part timing with grouped comparable ops
+%% ===== Two-part timing (no shared steps) with warmup + median-of-N =====
 format short g; rng default;
 
-% Sizes
-m = 10000; n = 20000; l = 1000; s = 500; r = 400;
+% ---------- Config ----------
+N = 5;  % 每个步骤重复次数（预热 1 次 + 计时 N 次，取中位数）
 
-% ---------- Common steps (execute ONCE) ----------
-tic; A  = randn(m, n);                         tA   = toc;
+% ---------- Problem/setup (不计入两部分计时) ----------
+m = 10000; n = 20000;
+A = randn(m, n);
+ l = 1000; s = 500; r = 400;d=1000;s1=s;d1=d;
 
-tic; S  = rademacher_sparse(n, l, 0.01*n*l);   tS   = toc;  % 注意这里用 l（非 s）
-tic; Z  = A * S;                               tZ   = toc;
+%% ---------------- Part 1 ----------------
+[tPhi1,   Phi]    = timeit_step(@() rademacher_sparse(n, l, 0.05*n*l), N);
+[tOm1,    Omega1] = timeit_step(@() rademacher_sparse(n, s, 0.05*n*s), N);
 
-tic; S1 = rademacher_sparse(n, s, 0.01*n*s);   tS1  = toc;
-tic; Y0 = A * S1;                              tY0  = toc;
+[tZ1,     Z]      = timeit_step(@() A * Phi, N);
+[tY1,     Y1]     = timeit_step(@() A * Omega1, N);
 
-% ---------- Part 2 pre-QR steps (unique to Part 2) ----------
-tic; T1 = Z' * Y0;                             tT1    = toc;
-tic; [T1, ~] = qr(T1, 'econ');                 tQRT1  = toc;
-tic; Y2 = Z * T1;                              tY2    = toc;
 
-% ---------- Comparable block (aligned rows) ----------
-% Part 1: QR on Y0, then B1, tsvd(B1)
-tic; [Q1, ~] = qr(Y0, 'econ');                 tQR1    = toc;
-tic; B1 = Q1' * A;                             tB1     = toc;
-tic; [U1, Ssvd1, V1] = tsvd(B1, r); U1=Q1*U1;  tTSVD1  = toc; %#ok<NASGU,ASGLU>
+[tY2,     Y2]     = timeit_step(@() Z' * Y1, N);
+[tQRY2,   Qp1, ~] = timeit_step(@() qr(Y2, 'econ'), N);
+[tY3,     Y3]     = timeit_step(@() Z * Qp1, N);
 
-% Part 2: QR on Y2, then B2, tsvd(B2)
-tic; [Q2, ~] = qr(Y2, 'econ');                 tQR2    = toc;
-tic; B2 = Q2' * A;                             tB2     = toc;
-tic; [U2, Ssvd2, V2] = tsvd(B2, r); U2=Q2*U2;  tTSVD2  = toc; %#ok<NASGU,ASGLU>
+[tY4,     Y4]     = timeit_step(@() Z' * Y3, N);
+[tQRY21,   Qp2, ~] = timeit_step(@() qr(Y4, 'econ'), N);
+[tY5,     Y5]     = timeit_step(@() Z * Qp2, N);
 
-% ---------- Build table (group comparable rows) ----------
-Step = [                                   % 列向量
-    "A = randn(m,n)";
-    "S (n×l) generation";
-    "Z = A * S";
-    "S1 (n×s) generation";
-    "Y0 = A * S1";
-    "T1 = Z' * Y0 (Part2)";
-    "[T1,~] = qr(T1,'econ') (Part2)";
-    "Y2 = Z * T1 (Part2)";
-    "QR(Y):  Y0 (P1)  vs  Y2 (P2)";
-    "B = Q' * A:  B1 (P1)  vs  B2 (P2)";
-    "tsvd(B,r); U=Q*U:  P1  vs  P2";
-    "TOTAL";
+[tY6,     Y6]     = timeit_step(@() Z' * Y5, N);
+[tQRY22,   Qp3, ~] = timeit_step(@() qr(Y6, 'econ'), N);
+[tY7,     Y7]     = timeit_step(@() Z * Qp3, N);
+
+
+
+
+[tQRY3,   Q1,  ~] = timeit_step(@() qr(Y7, 'econ'), N);
+
+[tPsi1,   Psi1]   = timeit_step(@() rademacher_sparse(d,  m, 0.05*d*m), N);
+[tW1,     W1]     = timeit_step(@() Psi1 * A, N);
+[tB1,     B1]     = timeit_step(@() (Psi1 * Q1) \ W1, N);
+[tTSVD1,  U1, S1, V1] = timeit_step(@() tsvd(B1, r), N); 
+[tUup1,   U1]     = timeit_step(@() Q1 * U1, N); 
+
+%% ---------------- Part 2 ----------------
+[tOm2,    Omega]  = timeit_step(@() rademacher_sparse(n, s1, 0.05*n*s1), N);
+[tY,      Y]      = timeit_step(@() A * Omega, N);
+
+[tQRY,    Qp2, ~] = timeit_step(@() qr(Y, 'econ'), N);
+
+[tPsi2,   Psi2]   = timeit_step(@() rademacher_sparse(d1, m, 0.05*d1*m), N);
+[tW,      W]      = timeit_step(@() Psi2 * A, N);
+[tB2,     B2]     = timeit_step(@() (Psi2 * Qp2) \ W, N);
+[tTSVD2,  U2, S2, V2] = timeit_step(@() tsvd(B2, r), N);
+[tUup2,   U2]     = timeit_step(@() Qp2 * U2, N);
+
+%% ---------------- Assemble comparison table ----------------
+Step = [
+    "Phi (n×l) generation";
+    "Omega generation";
+    "Z = A * Phi";
+    "Y = A * Omega";
+    "Y2 = Z' * Y (or Y1)";
+    "QR on Y2 / Y";
+    "Y3 = Z * Q (from Y2)";
+    "QR on Y3";
+    "Psi (⋅×m) generation";
+    "W = Psi * A";
+    "Solve B = (Psi*Q)\\W";
+    "TSVD: [U,S,V] = tsvd(B,r)";
+    "U ← Q*U (or Q1*U)";
+    "TOTAL (sum of medians)";
 ];
 
-% Part 1（公共步骤同值；Part2 专有步骤填 NaN；可比较步骤填各自时间）
-Time_s_Part1 = [
-    tA;
-    NaN;
-    NaN;
-    tS1;
-    tY0;
-    NaN;
-    NaN;
-    NaN;
-    tQR1;
-    tB1;
-    tTSVD1;
-    NaN  % 占位，稍后回填总计
-];
 
-% Part 2
-Time_s_Part2 = [
-    tA;
-    tS;
-    tZ;
-    tS1;
-    tY0;
-    tT1;
-    tQRT1;
-    tY2;
-    tQR2;
+
+Time_Part1 = [
+    NaN;
+    tOm2;
+    NaN;
+    tY;
+    NaN;
+    tQRY;
+    NaN;
+    NaN;
+    tPsi2;
+    tW;
     tB2;
     tTSVD2;
-    NaN  % 占位，稍后回填总计
+    tUup2;
+    NaN
+];
+Time_Part2 = [
+    tPhi1;
+    tOm1;
+    tZ1;
+    tY1;
+    tY2;
+    tQRY2;
+    tY3;
+    tQRY3;
+    tPsi1;
+    tW1;
+    tB1;
+    tTSVD1;
+    tUup1;
+    NaN
 ];
 
-% Totals (ignore NaN)
-Time_s_Part1(end) = nansum(Time_s_Part1(1:end-1));
-Time_s_Part2(end) = nansum(Time_s_Part2(1:end-1));
+Time_Part3 = [
+    tPhi1;
+    tOm1;
+    tZ1;
+    tY1;
+    tY2+tY4;
+    tQRY2+tQRY21;
+    tY3+tY5;
+    tQRY3;
+    tPsi1;
+    tW1;
+    tB1;
+    tTSVD1;
+    tUup1;
+    NaN
+];
+Time_Part4 = [
+    tPhi1;
+    tOm1;
+    tZ1;
+    tY1;
+    tY2+tY4+tY6;
+    tQRY2+tQRY21+tQRY22;
+    tY3+tY5+tY7;
+    tQRY3;
+    tPsi1;
+    tW1;
+    tB1;
+    tTSVD1;
+    tUup1;
+    NaN
+];
 
-% Print to console
-T = table(Step, Time_s_Part1, Time_s_Part2);
+
+Time_Part1(end) = nansum(Time_Part1(1:end-1));
+Time_Part2(end) = nansum(Time_Part2(1:end-1));
+Time_Part3(end) = nansum(Time_Part3(1:end-1));
+Time_Part4(end) = nansum(Time_Part4(1:end-1));
+
+T = table(Step, Time_Part1, Time_Part2,Time_Part3,Time_Part4);
 disp(T);
 
-% 如需把 NaN 显示为 0，可追加：
-% T0 = T; T0.Time_s_Part1(isnan(T0.Time_s_Part1)) = 0; T0.Time_s_Part2(isnan(T0.Time_s_Part2)) = 0; disp(T0);
+%% ===== Helper: warmup + median-of-N timer with output capture =====
+function [tmed, varargout] = timeit_step(fh, N)
+    if nargin < 2 || isempty(N), N = 5; end
+    % 预热
+    fh();
+    ts = zeros(N,1);
+    for i = 1:N
+        t0 = tic;
+        if nargout > 1 && i == N
+            [varargout{1:nargout-1}] = fh(); % 最后一次把结果带出来（含多个输出）
+        else
+            fh();
+        end
+        ts(i) = toc(t0);
+    end
+    tmed = median(ts);
+end
