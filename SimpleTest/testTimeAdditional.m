@@ -2,16 +2,19 @@
 format short g; rng default;
 
 % ---------- Config ----------
-N = 5;  % 每个步骤重复次数（预热 1 次 + 计时 N 次，取中位数）
+N = 20;  % 每个步骤重复次数（预热 1 次 + 计时 N 次，取中位数）
 
 % ---------- Problem/setup (不计入两部分计时) ----------
-m = 10000; n = 20000;
+m = 20000; n = 30000;
 A = randn(m, n);
- l = 1000; s = 500; r = 400;d=1000;s1=s;d1=d;
+ % l = 400; s = 110; r = 100;d=800;s1=s;d1=d;
+ l = 1000; s = 510; r = 100;d=800;s1=s;d1=d;
+
+ spar_lv = 0.05;
 
 %% ---------------- Part 1 ----------------
-[tPhi1,   Phi]    = timeit_step(@() rademacher_sparse(n, l, 0.05*n*l), N);
-[tOm1,    Omega1] = timeit_step(@() rademacher_sparse(n, s, 0.05*n*s), N);
+[tPhi1,   Phi]    = timeit_step(@() rademacher_sparse(n, l, spar_lv*n*l), N);
+[tOm1,    Omega1] = timeit_step(@() rademacher_sparse(n, s, spar_lv*n*s), N);
 
 [tZ1,     Z]      = timeit_step(@() A * Phi, N);
 [tY1,     Y1]     = timeit_step(@() A * Omega1, N);
@@ -34,23 +37,37 @@ A = randn(m, n);
 
 [tQRY3,   Q1,  ~] = timeit_step(@() qr(Y7, 'econ'), N);
 
-[tPsi1,   Psi1]   = timeit_step(@() rademacher_sparse(d,  m, 0.05*d*m), N);
+[tPsi1,   Psi1]   = timeit_step(@() rademacher_sparse(d,  m, 0.1*d*m), N);
 [tW1,     W1]     = timeit_step(@() Psi1 * A, N);
 [tB1,     B1]     = timeit_step(@() (Psi1 * Q1) \ W1, N);
-[tTSVD1,  U1, S1, V1] = timeit_step(@() tsvd(B1, r), N); 
-[tUup1,   U1]     = timeit_step(@() Q1 * U1, N); 
+[tPreSVD1,QU1,RU1]=timeit_step(@() qr(B1','econ'),N);
+[tTSVD1,  U1, S1, V1] = timeit_step(@() tsvd(RU1, r), N);
+tTSVD1=tPreSVD1+tTSVD1;
+[tUup1,   UU1]     = timeit_step(@() Q1 * V1, N); 
+[tUup11,   V1]     = timeit_step(@() QU1 * U1, N); 
+tUup1=tUup1+tUup11;
+
 
 %% ---------------- Part 2 ----------------
-[tOm2,    Omega]  = timeit_step(@() rademacher_sparse(n, s1, 0.05*n*s1), N);
+[tOm2,    Omega]  = timeit_step(@() rademacher_sparse(n, s1, spar_lv*n*s1), N);
 [tY,      Y]      = timeit_step(@() A * Omega, N);
 
 [tQRY,    Qp2, ~] = timeit_step(@() qr(Y, 'econ'), N);
 
-[tPsi2,   Psi2]   = timeit_step(@() rademacher_sparse(d1, m, 0.05*d1*m), N);
+[tPsi2,   Psi2]   = timeit_step(@() rademacher_sparse(d1, m, 0.1*d1*m), N);
 [tW,      W]      = timeit_step(@() Psi2 * A, N);
 [tB2,     B2]     = timeit_step(@() (Psi2 * Qp2) \ W, N);
-[tTSVD2,  U2, S2, V2] = timeit_step(@() tsvd(B2, r), N);
-[tUup2,   U2]     = timeit_step(@() Qp2 * U2, N);
+
+
+% [tTSVD2,  U2, S2, V2] = timeit_step(@() tsvd(B2, r), N);
+% [tUup2,   U2]     = timeit_step(@() Qp2 * U2, N);
+
+[tPreSVD2,QU2,RU2]=timeit_step(@() qr(B2','econ'),N);
+[tTSVD2,  U2, S2, V2] = timeit_step(@() tsvd(RU2, r), N);
+tTSVD2=tPreSVD2+tTSVD2;
+[tUup2,   UU2]     = timeit_step(@() Qp2 * V2, N); 
+[tUup21,   V2]     = timeit_step(@() QU2 * U2, N); 
+tUup2=tUup2+tUup21;
 
 %% ---------------- Assemble comparison table ----------------
 Step = [
@@ -59,9 +76,9 @@ Step = [
     "Z = A * Phi";
     "Y = A * Omega";
     "Y2 = Z' * Y (or Y1)";
-    "QR on Y2 / Y";
+    "QR on Y2";
     "Y3 = Z * Q (from Y2)";
-    "QR on Y3";
+    "QR on Y or Y3";
     "Psi (⋅×m) generation";
     "W = Psi * A";
     "Solve B = (Psi*Q)\\W";
@@ -78,9 +95,9 @@ Time_Part1 = [
     NaN;
     tY;
     NaN;
+    NaN;
+    NaN;
     tQRY;
-    NaN;
-    NaN;
     tPsi2;
     tW;
     tB2;
@@ -162,5 +179,5 @@ function [tmed, varargout] = timeit_step(fh, N)
         end
         ts(i) = toc(t0);
     end
-    tmed = median(ts);
+    tmed = mean(ts);
 end
