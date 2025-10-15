@@ -179,5 +179,5 @@ function [tmed, varargout] = timeit_step(fh, N)
         end
         ts(i) = toc(t0);
     end
-    tmed = mean(ts);
+    tmed = median(ts);
 end
