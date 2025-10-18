@@ -3,6 +3,8 @@ changeCurrentFolderToScriptFolder;
 RunExample1;
 RunExample2;
 RunExample3;
+RunExample4;
+RunExample5;
 RunExampleSM1;
 RunExampleSM2;
 RunExampleSM3;

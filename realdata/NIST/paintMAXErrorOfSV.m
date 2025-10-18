@@ -46,7 +46,7 @@ end
     % ErrListStoreMAX=ErrListStoreMAX+ErrListMAX;
     % ErrListStoreMAIN=ErrListStoreMAIN+ErrListMAIN;
 %%
-figure(1);
+figure;
 paintFunc(@semilogy,Tlist,ErrListMean,{':','-','-.'},'DisplayName',{'SPI q=1','TYUC17','RSVD'},'ColorOrder',[1,4,7]);
 
 xlabel('storage budget: T');
@@ -55,7 +55,7 @@ saveas(gcf,"figure/NISTSingularVector/SingularVectorError/NISTSingularVector_Err
 
 
 
-figure(2);
+figure;
 paintFunc(@semilogy,Tlist,ErrListMean2,{':','-','-.'},'DisplayName',{'SPI q=1','TYUC17','RSVD'},'ColorOrder',[1,4,7]);
 xlabel('storage budget: T');
 ylabel('$\sin(\theta_2)$','Interpreter','latex');

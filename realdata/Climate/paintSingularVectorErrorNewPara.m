@@ -52,13 +52,13 @@ end
 % ErrListMAX=ErrListStoreMAX/MentoCarloNum;
 % ErrListMAIN=ErrListStoreMAIN/MentoCarloNum;
 %%
-figure(1);
+figure;
 paintFunc(@semilogy,Tlist,ErrListMean,{':','-','-.'},'DisplayName',{'SPI q=1','TYUC17','RSVD'},'ColorOrder',[1,4,7]);
 
 xlabel('storage budget: T');
 ylabel('$\sin(\theta_1)$','Interpreter','latex');
 saveas(gcf,strcat("figureNewPara/ClimateSingularVectorError_",num2str(1),".fig"));
-figure(2);
+figure;
 paintFunc(@semilogy,Tlist,ErrListMean2,{':','-','-.'},'DisplayName',{'SPI q=1','TYUC17','RSVD'},'ColorOrder',[1,4,7]);
 xlabel('storage budget: T');
 ylabel('$\sin(\theta_2)$','Interpreter','latex');

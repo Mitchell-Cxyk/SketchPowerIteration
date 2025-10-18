@@ -2,22 +2,35 @@
 format short g; rng default;
 
 % ---------- Config ----------
-N = 20;  % 每个步骤重复次数（预热 1 次 + 计时 N 次，取中位数）
+N = 3;  % 每个步骤重复次数（预热 1 次 + 计时 N 次，取中位数）
 
 % ---------- Problem/setup (不计入两部分计时) ----------
 m = 20000; n = 30000;
 A = randn(m, n);
  % l = 400; s = 110; r = 100;d=800;s1=s;d1=d;
- l = 1000; s = 510; r = 100;d=800;s1=s;d1=d;
+ l = 1000; s = 510; r = 100;d=1000;s1=s;d1=d;
 
  spar_lv = 0.05;
 
 %% ---------------- Part 1 ----------------
-[tPhi1,   Phi]    = timeit_step(@() rademacher_sparse(n, l, spar_lv*n*l), N);
-[tOm1,    Omega1] = timeit_step(@() rademacher_sparse(n, s, spar_lv*n*s), N);
+[tPhi1,   Phi]    = timeit_step(@() constructTestMatrix(l, n,'sparsesign'), N);
+[tOm1,    Omega1] = timeit_step(@() constructTestMatrix(s, n, 'sparsesign'), N);
+[tPsi1,   Psi1]   = timeit_step(@() constructTestMatrix(d,  m, 'sparsesign'), N);
+[tW1,     W1]     = timeit_step(@() Psi1 * A, N);
+[tPsi2,   Psi2]   = timeit_step(@() constructTestMatrix(d1, m, 'sparsesign'), N);
+[tW,      W]      = timeit_step(@() Psi2 * A, N);
+A=A';
+[tOm2,    Omega]  = timeit_step(@() constructTestMatrix(s1, n, 'sparsesign'), N);
+[tY,      Y]      = timeit_step(@() Omega*A, N);
 
-[tZ1,     Z]      = timeit_step(@() A * Phi, N);
-[tY1,     Y1]     = timeit_step(@() A * Omega1, N);
+
+
+[tZ1,     Z]      = timeit_step(@() Phi*A, N);
+[tY1,     Y1]     = timeit_step(@() Omega1*A, N);
+Y=Y';Z=Z';Y1=Y1';
+
+clear('A',"var");
+% tY1=tY1/4;
 
 
 [tY2,     Y2]     = timeit_step(@() Z' * Y1, N);
@@ -37,8 +50,7 @@ A = randn(m, n);
 
 [tQRY3,   Q1,  ~] = timeit_step(@() qr(Y7, 'econ'), N);
 
-[tPsi1,   Psi1]   = timeit_step(@() rademacher_sparse(d,  m, 0.1*d*m), N);
-[tW1,     W1]     = timeit_step(@() Psi1 * A, N);
+
 [tB1,     B1]     = timeit_step(@() (Psi1 * Q1) \ W1, N);
 [tPreSVD1,QU1,RU1]=timeit_step(@() qr(B1','econ'),N);
 [tTSVD1,  U1, S1, V1] = timeit_step(@() tsvd(RU1, r), N);
@@ -49,13 +61,12 @@ tUup1=tUup1+tUup11;
 
 
 %% ---------------- Part 2 ----------------
-[tOm2,    Omega]  = timeit_step(@() rademacher_sparse(n, s1, spar_lv*n*s1), N);
-[tY,      Y]      = timeit_step(@() A * Omega, N);
+
+% tY=tY/4;
 
 [tQRY,    Qp2, ~] = timeit_step(@() qr(Y, 'econ'), N);
 
-[tPsi2,   Psi2]   = timeit_step(@() rademacher_sparse(d1, m, 0.1*d1*m), N);
-[tW,      W]      = timeit_step(@() Psi2 * A, N);
+
 [tB2,     B2]     = timeit_step(@() (Psi2 * Qp2) \ W, N);
 
 

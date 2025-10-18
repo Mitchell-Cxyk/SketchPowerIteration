@@ -1,0 +1,4 @@
+changeCurrentFolderToScriptFolder;
+cd realdata/NIST;
+paintSingularValues;
+paintMAXErrorOfSV;

@@ -30,6 +30,7 @@ Folder/
     │   └── TYUC17withSPSOracle
     │       └── figure
     │           └── SketchSingularValue
+                |__ qFigure
     ├── realdata
     │   ├── Climate
     │   │   ├── data
@@ -57,7 +58,7 @@ The code in this Repository can mkdir automatically. If the path error "not exis
 
 ## Run RunExamples
 
-1. You can run the **RunTests.m** to run all tests. However, it may **costs much time**. You can run the m files in **RunExamples** Folder. Run the scripts RunExample 1-3 .m files to get the results in main paper. Run the scripts RunExampleSM 1-3 .m files to get the results in Supplement Materials.
+1. You can run the **RunTests.m** to run all tests. However, it may **costs much time**. You can run the m files in **RunExamples** Folder. Run the scripts RunExample 1-5 .m files to get the results in main paper. Run the scripts RunExampleSM 1-4 .m files to get the results in Supplement Materials.
 2. All data and figure is stored in figure/ or data/ in the corresponding subfolders. One can get more information out of the paper.
 3. Reading the RunExample m files can help to find the corresponding subfolder for each example.
 4. Run paintFigs(*).m to watch the results. The first figure is to show some important tips. Then you can press any key to watch the next figure when figures are shown.

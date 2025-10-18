@@ -7,4 +7,4 @@ text(0.5, 0.5, 'Press enter to show first figures. Then press enter to show next
     'VerticalAlignment', 'middle');
 key = waitforbuttonpress;        % Wait for user input
 close all;
-showFigFiles('FolderName','./testStreamingSPI/figure');
+showFigFiles('FolderName','./testYinC/figure/W1');

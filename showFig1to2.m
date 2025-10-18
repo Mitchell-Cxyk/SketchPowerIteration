@@ -1,4 +1,6 @@
 changeCurrentFolderToScriptFolder;
 cd VerifyPerformance\TYUC17withSPSOracle;
-paintSyneSingularValue;
-cd ../..;
+paintAll;
+paintAllSpectral;
+disp(['The figure is in:',pwd,'/figure']);
+,
